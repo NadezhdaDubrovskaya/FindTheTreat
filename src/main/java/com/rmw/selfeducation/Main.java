@@ -6,6 +6,7 @@ import processing.core.PApplet;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,13 +33,32 @@ public class Main extends PApplet {
     @Override
     public void setup() {
         final String[] mapConfiguration = getMapConfiguration();
+
+        // generate map tiles in accordance to the map configuration and assign the corresponding tiles
+        // from the game screen to each
+        // also configure the wall and the treat tile
         for (int i = 0; i < ROWS; i++) {
             for (int j = 0; j < COLS; j++) {
-                final char tileConfig = mapConfiguration[i].toCharArray()[j];
-                final Colour colour = tileConfig == '0' ? new Colour(176, 189, 193) : new Colour(0, 0, 0);
+                final char tileSetting = mapConfiguration[i].toCharArray()[j];
+                final Tile requiredTire = gameScreen.getTileAtPosition(i, j);
+                final Colour colour = new Colour(0, 0, 0);
+                switch (tileSetting) {
+                    case '0':
+                        colour.changeColour(175, 190, 190);
+                        break;
+                    case '1':
+                        requiredTire.setWall(true);
+                        break;
+                    case 'X':
+                        colour.changeColour(165, 245, 85);
+                        requiredTire.setTreat(true);
+                        break;
+                    default:
+                        throw new InvalidParameterException("Got invalid tile configuration " + tileSetting);
+                }
                 final RectangularObject rectangle = new RectangularObject(this, colour);
                 mapTiles.add(rectangle);
-                rectangle.setTile(gameScreen.getTileAtPosition(i, j));
+                rectangle.setTile(requiredTire);
             }
         }
         final Tile startingTile = gameScreen.getTileAtPosition(5, 5);
@@ -51,7 +71,6 @@ public class Main extends PApplet {
         mapTiles.forEach(ScreenObject::update);
         player.update();
     }
-
 
     @Override
     public void keyPressed() {
@@ -75,6 +94,9 @@ public class Main extends PApplet {
             default:
                 return;
         }
+        if (newTile == null || newTile.isWall()) {
+            return;
+        }
         player.setTile(null);
         currentTile.setScreenObject(null);
         newTile.setScreenObject(player);
@@ -92,7 +114,7 @@ public class Main extends PApplet {
             if (stream(mapSplittedByLines).anyMatch(s -> s.length() != COLS)) {
                 throw new IllegalArgumentException("Map configuration doesn't match with the provided columns configuration");
             }
-            if (stream(mapSplittedByLines).anyMatch(s -> !s.matches("[0-1]+"))) {
+            if (stream(mapSplittedByLines).anyMatch(s -> !s.matches("[0-1,X]+"))) {
                 throw new IllegalArgumentException("Map configuration contains not allowed characters");
             }
             inputStream.close();

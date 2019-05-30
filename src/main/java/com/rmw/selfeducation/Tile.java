@@ -9,11 +9,17 @@ class Tile {
     /**
      * indicates if the tile is a wall
      */
-    private boolean isWall;
+    private boolean wall;
+    /**
+     * indicates if the tile is a treat
+     */
+    private boolean treat;
 
     Tile(final Integer row, final Integer column) {
         this.row = row;
         this.column = column;
+        wall = false;
+        treat = false;
     }
 
     /**
@@ -42,10 +48,18 @@ class Tile {
     }
 
     boolean isWall() {
-        return isWall;
+        return wall;
     }
 
     void setWall(final boolean wall) {
-        isWall = wall;
+        this.wall = wall;
+    }
+
+    boolean isTreat() {
+        return treat;
+    }
+
+    void setTreat(final boolean treat) {
+        this.treat = treat;
     }
 }
