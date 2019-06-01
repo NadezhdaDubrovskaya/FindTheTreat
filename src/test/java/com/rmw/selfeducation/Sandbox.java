@@ -5,9 +5,9 @@ import org.junit.Test;
 public class Sandbox {
 
     @Test
-    public void testNetworkGeneration() {
+    public void testAddNodeMutation() {
         final Genome genome = new Genome();
-        genome.addConnectionMutation();
+        genome.addNodeMutation();
     }
 
 }

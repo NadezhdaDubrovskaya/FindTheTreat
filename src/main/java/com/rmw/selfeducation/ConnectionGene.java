@@ -44,8 +44,12 @@ class ConnectionGene {
         return expressed;
     }
 
-    void setExpressed(final boolean expressed) {
-        this.expressed = expressed;
+    void disable() {
+        expressed = false;
+    }
+
+    void enable() {
+        expressed = true;
     }
 
     int getInnovationNumber() {
