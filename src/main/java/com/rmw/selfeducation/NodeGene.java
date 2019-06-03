@@ -56,7 +56,7 @@ class NodeGene {
         return type;
     }
 
-    public void setOutputValue(final float outputValue) {
+    void setOutputValue(final float outputValue) {
         this.outputValue = outputValue;
     }
 
