@@ -31,10 +31,20 @@ class Configuration {
     static final float START_Y = 0;
     static final float ANN_WIDTH = WIDTH * 0.95f - START_X;
     static final float ANN_HEIGHT = (float) ROWS * SCALE;
+    static final float NODE_SIZE = 25; //radius
 
     //ANN configuration
     static final int INPUT_NEURONS_AMOUNT = 8;
     static final int OUTPUT_NEURONS_AMOUNT = 2;
+
+    // Colors
+    static final Colour BLACK = new Colour(0, 0, 0);
+    static final Colour WHITE = new Colour(255, 255, 255);
+    static final Colour RED = new Colour(215, 50, 10);
+    static final Colour BLUE = new Colour(10, 50, 215);
+    static final Colour LIGHT_GREEN = new Colour(157, 229, 84);
+    static final Colour MEDIUM_GRAY = new Colour(132, 132, 132);
+    static final Colour LIGHT_BLUE = new Colour(155, 215, 245);
 
     private Configuration() {
     }

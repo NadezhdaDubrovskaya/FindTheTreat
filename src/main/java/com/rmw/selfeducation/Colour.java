@@ -1,7 +1,7 @@
 package com.rmw.selfeducation;
 
 /**
- * Represents an RGB colour that is used in the filling of processing visual objects
+ * Represents RGB colour that is used by Processing
  */
 class Colour {
 
@@ -21,4 +21,9 @@ class Colour {
         this.v3 = v3;
     }
 
+    void changeColour(final Colour colour) {
+        v1 = colour.v1;
+        v2 = colour.v2;
+        v3 = colour.v3;
+    }
 }

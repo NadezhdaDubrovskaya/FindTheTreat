@@ -47,6 +47,10 @@ class NodeGene {
         this.layer = layer;
     }
 
+    List<ConnectionGene> getOutgoingConnections() {
+        return outputConnections;
+    }
+
     void addOutgoingConnection(final ConnectionGene connection) {
         outputConnections.add(connection);
     }
@@ -68,8 +72,38 @@ class NodeGene {
         position.y = y;
     }
 
-    void setOutputValue(final float outputValue) {
-        this.outputValue = outputValue;
+    /**
+     * Resets both sum and outputValue of the neuron
+     */
+    void reset() {
+        sumValue = 0;
+        outputValue = 0;
+    }
+
+    /**
+     * Is used during feed forward
+     * Whenever the sumValue is changed, recalculate the outputValue using the activation function
+     * @param value - to be added to the sumValue
+     */
+    void addSumValue(final float value) {
+        sumValue = sumValue + value;
+        calculateOutputValue();
+    }
+
+    private void calculateOutputValue() {
+        if (sumValue >= 1) {
+            outputValue = 1;
+            return;
+        }
+        if (sumValue <= -1) {
+            outputValue = -1;
+            return;
+        }
+        outputValue = 0;
+    }
+
+    float getOutputValue() {
+        return outputValue;
     }
 
     @Override

@@ -9,18 +9,25 @@ import java.nio.charset.StandardCharsets;
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import static com.rmw.selfeducation.Configuration.ANN_HEIGHT;
 import static com.rmw.selfeducation.Configuration.ANN_WIDTH;
+import static com.rmw.selfeducation.Configuration.BLACK;
 import static com.rmw.selfeducation.Configuration.COLS;
 import static com.rmw.selfeducation.Configuration.EMPTY_TILE;
 import static com.rmw.selfeducation.Configuration.HEIGHT;
+import static com.rmw.selfeducation.Configuration.LIGHT_BLUE;
+import static com.rmw.selfeducation.Configuration.LIGHT_GREEN;
+import static com.rmw.selfeducation.Configuration.MEDIUM_GRAY;
 import static com.rmw.selfeducation.Configuration.ROWS;
 import static com.rmw.selfeducation.Configuration.SCALE;
 import static com.rmw.selfeducation.Configuration.START_X;
 import static com.rmw.selfeducation.Configuration.START_Y;
 import static com.rmw.selfeducation.Configuration.TREAT_TILE;
 import static com.rmw.selfeducation.Configuration.WALL_TILE;
+import static com.rmw.selfeducation.Configuration.WHITE;
 import static com.rmw.selfeducation.Configuration.WIDTH;
 import static java.text.MessageFormat.format;
 import static java.util.Arrays.stream;
@@ -30,8 +37,14 @@ public class Main extends PApplet {
     private final ScreenObject player = new CircularObject(this);
     private final List<ScreenObject> mapTiles = new ArrayList<>();
     private final GameScreen gameScreen = new GameScreen();
+    private final DrawNetworkUtility drawNetworkUtility = new DrawNetworkUtility(this);
+    //control buttons
+    private final Button addNodeMutationButton = new Button("Add Node Mutation", 50, ROWS * SCALE + 50, 130, 30);
+    private final Button addConnectionMutationButton = new Button("Add Connection Mutation", 50, ROWS * SCALE + 100, 130, 30);
+    private final Button generateNewNetworkButton = new Button("Generate New Network", 50, ROWS * SCALE + 150, 130, 30);
     //TODO this is the test genome, remove it later on
-    private final Genome genome = new Genome();
+    private Genome genome = new Genome();
+
 
     public static void main(final String[] args) {
         PApplet.main("com.rmw.selfeducation.Main", args);
@@ -49,10 +62,11 @@ public class Main extends PApplet {
 
     @Override
     public void draw() {
-        background(200, 225, 225);
+        background(LIGHT_BLUE.v1, LIGHT_BLUE.v2, LIGHT_BLUE.v3);
         mapTiles.forEach(ScreenObject::update);
         player.update();
         drawNeuralNetwork();
+        drawControlPanel();
     }
 
     @Override
@@ -86,6 +100,20 @@ public class Main extends PApplet {
         player.setTile(newTile);
     }
 
+    @Override
+    public void mousePressed() {
+        if (addNodeMutationButton.mouseIsOver()) {
+            genome.addNodeMutation();
+        }
+        if (addConnectionMutationButton.mouseIsOver()) {
+            genome.addConnectionMutation();
+        }
+        if (generateNewNetworkButton.mouseIsOver()) {
+            Innovations.reset();
+            genome = new Genome();
+        }
+    }
+
     private String[] getMapConfiguration() {
         try {
             final InputStream inputStream = getClass().getClassLoader().getResourceAsStream("map.conf");
@@ -117,16 +145,16 @@ public class Main extends PApplet {
             for (int j = 0; j < COLS; j++) {
                 final char tileSetting = mapConfiguration[i].toCharArray()[j];
                 final Tile requiredTire = gameScreen.getTileAtPosition(i, j);
-                final Colour colour = new Colour(0, 0, 0);
+                final Colour colour = new Colour(BLACK.v1, BLACK.v2, BLACK.v3);
                 switch (tileSetting) {
                     case EMPTY_TILE:
-                        colour.changeColour(175, 190, 190);
+                        colour.changeColour(MEDIUM_GRAY);
                         break;
                     case WALL_TILE:
                         requiredTire.setWall(true);
                         break;
                     case TREAT_TILE:
-                        colour.changeColour(165, 245, 85);
+                        colour.changeColour(LIGHT_GREEN);
                         requiredTire.setTreat(true);
                         break;
                     default:
@@ -141,11 +169,46 @@ public class Main extends PApplet {
         player.setTile(startingTile);
     }
 
-    // TODO should draw currently best performing network but for now showing test network
+    // TODO should show currently best performing network but for now showing test network
     private void drawNeuralNetwork() {
-        fill(255,255,255);
+        fill(WHITE.v1, WHITE.v2, WHITE.v3);
         rect(START_X, START_Y, ANN_WIDTH, ANN_HEIGHT);
-        genome.draw(this);
+        drawNetworkUtility.draw(genome);
+    }
+
+    private void drawControlPanel() {
+        addNodeMutationButton.show();
+        addConnectionMutationButton.show();
+        generateNewNetworkButton.show();
+    }
+
+    class Button {
+        String label;
+        float x;
+        float y;
+        float width;
+        float height;
+
+        Button(final String label, final float x, final float y, final float width, final float height) {
+            this.label = label;
+            this.x = x;
+            this.y = y;
+            this.width = width;
+            this.height = height;
+        }
+
+        void show() {
+            fill(LIGHT_GREEN.v1, LIGHT_GREEN.v2, LIGHT_GREEN.v3);
+            stroke(BLACK.v1, BLACK.v2, BLACK.v3);
+            rect(x, y, width, height, 10);
+            textAlign(CENTER, CENTER);
+            fill(0);
+            text(label, x + (width / 2), y + (height / 2));
+        }
+
+        boolean mouseIsOver() {
+            return mouseX > x && mouseX < (x + width) && mouseY > y && mouseY < (y + height);
+        }
     }
 }
 

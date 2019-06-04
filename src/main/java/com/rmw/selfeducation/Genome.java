@@ -1,8 +1,5 @@
 package com.rmw.selfeducation;
 
-import processing.core.PApplet;
-import processing.core.PVector;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -10,12 +7,8 @@ import java.util.Random;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
-import static com.rmw.selfeducation.Configuration.ANN_HEIGHT;
-import static com.rmw.selfeducation.Configuration.ANN_WIDTH;
 import static com.rmw.selfeducation.Configuration.INPUT_NEURONS_AMOUNT;
 import static com.rmw.selfeducation.Configuration.OUTPUT_NEURONS_AMOUNT;
-import static com.rmw.selfeducation.Configuration.START_X;
-import static com.rmw.selfeducation.Configuration.START_Y;
 import static com.rmw.selfeducation.Innovations.newConnectionInnovationNumber;
 import static com.rmw.selfeducation.Innovations.newNodeInnovationNumber;
 import static com.rmw.selfeducation.NeuronType.BIAS;
@@ -43,7 +36,7 @@ class Genome {
         // add bias neuron to the network first
         final NodeGene bias = new NodeGene(newNodeInnovationNumber(), BIAS);
         bias.setLayer(0);
-        bias.setOutputValue(1f); //bias neuron always has an output value of 1
+        bias.addSumValue(1f); //bias neuron always has an output value of 1
         nodes.put(bias.getId(), bias);
 
         // generate input nodes
@@ -63,6 +56,62 @@ class Genome {
         connectNeurons();
         updateAmountOfLayers();
         updateNodesByLayers();
+    }
+
+    Map<Integer, NodeGene> getNodes() {
+        return nodes;
+    }
+
+    Map<Integer, ConnectionGene> getConnections() {
+        return connections;
+    }
+
+    Map<Integer, List<NodeGene>> getNodesByLayer() {
+        return nodesByLayer;
+    }
+
+    int getAmountOfLayers() {
+        return amountOfLayers;
+    }
+
+    /**
+     * Used to set inputs for the network
+     *
+     * @param inputs - map with inputs where key is an innovation number of the neuron
+     */
+    void setInputs(final Map<Integer, Float> inputs) {
+        // reset all neurons except the BIAS one
+        nodes.values().forEach(node -> {
+            if (node.getType() != BIAS) {
+                node.reset();
+            }
+        });
+        // set new values for input neurons
+        for (final Map.Entry<Integer, Float> entry : inputs.entrySet()) {
+            nodes.get(entry.getKey()).addSumValue(entry.getValue());
+        }
+    }
+
+    /**
+     * Calculates output of the neural network based on the inputs
+     *
+     * @return list of output values from each output node
+     */
+    List<Float> feedForward() {
+        final List<Float> result = new ArrayList<>(OUTPUT_NEURONS_AMOUNT);
+        // go through all of the neurons and feedForward its output to the nodes its connected with
+        nodesByLayer.values().forEach(layer ->
+                layer.forEach(node ->
+                        node.getOutgoingConnections().forEach(outgoingConnection -> {
+                            if (outgoingConnection.isExpressed()) {
+                                final NodeGene outGene = nodes.get(outgoingConnection.getOutNode());
+                                outGene.addSumValue(node.getOutputValue() * outgoingConnection.getWeight());
+                            }
+                        })
+                )
+        );
+        nodesByLayer.get(amountOfLayers - 1).forEach(outputNeuron -> result.add(outputNeuron.getOutputValue()));
+        return result;
     }
 
     /**
@@ -119,59 +168,6 @@ class Genome {
         addNewConnection(newNode, disabledConnectionOutNode, disabledConnectionWeight);
 
         updateNodesByLayers();
-    }
-
-    /**
-     * Draws all of the nodes and the connections to graphically represent the network
-     */
-    void draw(final PApplet pApplet) {
-        final float layerWidth = ANN_WIDTH / amountOfLayers;
-        final List<Float> layerStartingCoordinates = getStartingCoordinatesArray(amountOfLayers, layerWidth, START_X);
-
-        // update nodes coordinates
-        for (final Map.Entry<Integer, List<NodeGene>> entry : nodesByLayer.entrySet()) {
-            final int layer = entry.getKey();
-            final List<NodeGene> nodesInLayer = entry.getValue();
-            final int amountOfNodes = nodesInLayer.size();
-            final float rowHeight = ANN_HEIGHT / amountOfNodes;
-            final List<Float> rowStartingCoordinates = getStartingCoordinatesArray(amountOfNodes, rowHeight, START_Y);
-
-            for (int i = 0; i < amountOfNodes; i++) {
-                final float x = layerStartingCoordinates.get(layer) + layerWidth / 2;
-                final float y = rowStartingCoordinates.get(i) + rowHeight / 2;
-                nodesInLayer.get(i).setPosition(x, y);
-            }
-        }
-
-        //draw connections
-        connections.values().forEach(connection -> {
-            if (connection.isExpressed()) {
-                final PVector startCoordinates = nodes.get(connection.getInNode()).getPosition();
-                final PVector endCoordinated = nodes.get(connection.getOutNode()).getPosition();
-                pApplet.strokeWeight(Math.abs(connection.getWeight()));
-                if (connection.getWeight() > 0) {
-                    pApplet.stroke(215, 50, 10);
-                } else {
-                    pApplet.stroke(10, 50, 215);
-                }
-                pApplet.line(startCoordinates.x, startCoordinates.y, endCoordinated.x, endCoordinated.y);
-            }
-        });
-
-        //draw nodes
-        nodes.values().forEach(node -> {
-            final PVector coordinates = node.getPosition();
-            //TODO move colour and size of nodes to the configuration
-            if (node.getType() == BIAS) {
-                pApplet.fill(215, 50, 10);
-            } else {
-                pApplet.fill(0, 0, 0);
-            }
-            pApplet.ellipse(coordinates.x, coordinates.y, 25, 25);
-            pApplet.fill(255, 255, 255);
-            pApplet.text(node.getId(), coordinates.x, coordinates.y);
-        });
-
     }
 
     /**
@@ -238,26 +234,6 @@ class Genome {
         final boolean nodesAreOnTheSameLayer = node1.getLayer() == node2.getLayer();
         final boolean nodesAreAlreadyConnected = node1.isConnectedTo(node2);
         return nodesAreTheSame || nodesAreOnTheSameLayer || nodesAreAlreadyConnected;
-    }
-
-    /**
-     * Is used to get an array that contains the starting coordinates of each row/column to display an ANN
-     * <p>
-     * For example, if we have 3 layers in the network, we want to know how to display
-     * them evenly on the that starts at 0 and has width of 10.
-     * The output array will contain the starting coordinates of each layer that is [0, 3.33, 6.66]
-     *
-     * @param arraySize       - amount of layers or nodes in the layer
-     * @param widthOrHeight   - already calculated width of the layer or height of row
-     * @param startCoordinate - starting x or y coordinate of the plane where the ANN should be displayed
-     * @return array with starting coordinates of each row/column to display an ANN
-     */
-    private List<Float> getStartingCoordinatesArray(final int arraySize, final float widthOrHeight, final float startCoordinate) {
-        final List<Float> result = new ArrayList<>(arraySize);
-        for (int i = 0; i < widthOrHeight; i++) {
-            result.add(i * widthOrHeight + startCoordinate);
-        }
-        return result;
     }
 
     private void updateAmountOfLayers() {
