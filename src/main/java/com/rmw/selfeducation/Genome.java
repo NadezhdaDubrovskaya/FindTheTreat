@@ -25,7 +25,6 @@ class Genome {
     private final Map<Integer, List<NodeGene>> nodesByLayer = new TreeMap<>();
     private int amountOfLayers; // currently in the genome
 
-
     /**
      * Fresh network always contains:
      * 2 layers of nodes - one for inputs and another one for outputs
