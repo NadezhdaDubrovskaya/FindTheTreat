@@ -8,7 +8,7 @@ class Configuration {
      */
     static final boolean IS_AI_MODE = true;
 
-    static final int WIDTH = 1280;
+    static final int WIDTH = 1500;
     static final int HEIGHT = 800;
 
     static final int ROWS = 15;
@@ -27,7 +27,7 @@ class Configuration {
     static final char TREAT_TILE = 'X';
 
     //Neural network graphical representation screen positioning
-    static final float START_X = WIDTH * 0.65f;
+    static final float START_X = COLS * SCALE + 50;
     static final float START_Y = 0;
     static final float ANN_WIDTH = WIDTH * 0.95f - START_X;
     static final float ANN_HEIGHT = (float) ROWS * SCALE;

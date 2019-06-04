@@ -27,6 +27,7 @@ class RectangularObject extends ScreenObject {
             setVectorPosition(xCoordinate, yCoordinate);
         }
         getPApplet().fill(getColour().v1, getColour().v2, getColour().v3);
+        getPApplet().stroke(0, 0, 0);
         getPApplet().rect(getVectorPosition().x, getVectorPosition().y, width, height);
     }
 

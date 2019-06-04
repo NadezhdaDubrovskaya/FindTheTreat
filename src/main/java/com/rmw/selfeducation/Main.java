@@ -45,10 +45,6 @@ public class Main extends PApplet {
     @Override
     public void setup() {
         drawGameScreen();
-        //TODO do not forget to remove this, test data
-        genome.addNodeMutation();
-        genome.addNodeMutation();
-        genome.addNodeMutation();
     }
 
     @Override

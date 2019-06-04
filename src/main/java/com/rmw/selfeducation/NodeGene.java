@@ -1,5 +1,7 @@
 package com.rmw.selfeducation;
 
+import processing.core.PVector;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,6 +10,7 @@ class NodeGene {
     private final int id;
     private final NeuronType type;
     private final List<ConnectionGene> outputConnections = new ArrayList<>();
+    private final PVector position = new PVector();
 
     private int layer;
 
@@ -54,6 +57,15 @@ class NodeGene {
 
     NeuronType getType() {
         return type;
+    }
+
+    PVector getPosition() {
+        return position;
+    }
+
+    void setPosition(final float x, final float y) {
+        position.x = x;
+        position.y = y;
     }
 
     void setOutputValue(final float outputValue) {

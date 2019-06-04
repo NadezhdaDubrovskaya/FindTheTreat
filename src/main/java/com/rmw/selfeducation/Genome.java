@@ -1,6 +1,7 @@
 package com.rmw.selfeducation;
 
 import processing.core.PApplet;
+import processing.core.PVector;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,10 +41,10 @@ class Genome {
      */
     Genome() {
         // add bias neuron to the network first
-        final NodeGene bias = new NodeGene(0, BIAS);
+        final NodeGene bias = new NodeGene(newNodeInnovationNumber(), BIAS);
         bias.setLayer(0);
         bias.setOutputValue(1f); //bias neuron always has an output value of 1
-        nodes.put(0, bias);
+        nodes.put(bias.getId(), bias);
 
         // generate input nodes
         for (int i = 0; i < INPUT_NEURONS_AMOUNT; i++) {
@@ -61,6 +62,7 @@ class Genome {
 
         connectNeurons();
         updateAmountOfLayers();
+        updateNodesByLayers();
     }
 
     /**
@@ -125,8 +127,8 @@ class Genome {
     void draw(final PApplet pApplet) {
         final float layerWidth = ANN_WIDTH / amountOfLayers;
         final List<Float> layerStartingCoordinates = getStartingCoordinatesArray(amountOfLayers, layerWidth, START_X);
-        layerStartingCoordinates.forEach(c -> pApplet.line(c, 0, c, ANN_HEIGHT));
-        // draw nodes
+
+        // update nodes coordinates
         for (final Map.Entry<Integer, List<NodeGene>> entry : nodesByLayer.entrySet()) {
             final int layer = entry.getKey();
             final List<NodeGene> nodesInLayer = entry.getValue();
@@ -137,11 +139,39 @@ class Genome {
             for (int i = 0; i < amountOfNodes; i++) {
                 final float x = layerStartingCoordinates.get(layer) + layerWidth / 2;
                 final float y = rowStartingCoordinates.get(i) + rowHeight / 2;
-                //TODO move this to the configuration
-                pApplet.fill(0, 0, 0);
-                pApplet.ellipse(x, y, 10, 10);
+                nodesInLayer.get(i).setPosition(x, y);
             }
         }
+
+        //draw connections
+        connections.values().forEach(connection -> {
+            if (connection.isExpressed()) {
+                final PVector startCoordinates = nodes.get(connection.getInNode()).getPosition();
+                final PVector endCoordinated = nodes.get(connection.getOutNode()).getPosition();
+                pApplet.strokeWeight(Math.abs(connection.getWeight()));
+                if (connection.getWeight() > 0) {
+                    pApplet.stroke(215, 50, 10);
+                } else {
+                    pApplet.stroke(10, 50, 215);
+                }
+                pApplet.line(startCoordinates.x, startCoordinates.y, endCoordinated.x, endCoordinated.y);
+            }
+        });
+
+        //draw nodes
+        nodes.values().forEach(node -> {
+            final PVector coordinates = node.getPosition();
+            //TODO move colour and size of nodes to the configuration
+            if (node.getType() == BIAS) {
+                pApplet.fill(215, 50, 10);
+            } else {
+                pApplet.fill(0, 0, 0);
+            }
+            pApplet.ellipse(coordinates.x, coordinates.y, 25, 25);
+            pApplet.fill(255, 255, 255);
+            pApplet.text(node.getId(), coordinates.x, coordinates.y);
+        });
+
     }
 
     /**
