@@ -120,7 +120,9 @@ class Genome {
      * If the network is fully connected, method does nothing
      */
     void addConnectionMutation() {
-        //TODO add a check if the network is already fully connected to avoid eternal while
+        if (networkFullyConnected()) {
+            return;
+        }
 
         NodeGene node1 = nodes.get(r.nextInt(nodes.size()));
         NodeGene node2 = nodes.get(r.nextInt(nodes.size()));
@@ -167,6 +169,32 @@ class Genome {
         addNewConnection(newNode, disabledConnectionOutNode, disabledConnectionWeight);
 
         updateNodesByLayers();
+    }
+
+    /**
+     * Checks if network is already fully connected (all nodes are connected with one another)
+     *
+     * @return - true if there is no place for a new connection
+     */
+    private boolean networkFullyConnected() {
+        for (final List<NodeGene> nodeOnLayer : nodesByLayer.values()) {
+            final int currentLayer = nodeOnLayer.get(0).getLayer();
+            // get all nodes from subsequent layers
+            final List<Integer> allNodesOnSubsequentLayers = nodes.values().stream()
+                    .filter(nodeGene -> nodeGene.getLayer() > currentLayer)
+                    .map(NodeGene::getId)
+                    .collect(Collectors.toList());
+            // go through all nodes on this layer and check whether
+            // it is connected to all nodes from the subsequent layers
+            for (final NodeGene node : nodeOnLayer) {
+                final List<Integer> outNodes = node.getOutgoingConnections().stream()
+                        .map(ConnectionGene::getOutNode).collect(Collectors.toList());
+                if (!outNodes.containsAll(allNodesOnSubsequentLayers)) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     /**
