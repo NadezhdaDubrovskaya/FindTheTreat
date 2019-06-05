@@ -5,7 +5,6 @@ class Tile {
 
     private final Integer row;
     private final Integer column;
-    private ScreenObject screenObject;
     /**
      * indicates if the tile is a wall
      */
@@ -22,23 +21,6 @@ class Tile {
         treat = false;
     }
 
-    /**
-     * Updates a screenObject that it contains
-     */
-    void update() {
-        if (screenObject != null) {
-            screenObject.update();
-        }
-    }
-
-    ScreenObject getScreenObject() {
-        return screenObject;
-    }
-
-    void setScreenObject(final ScreenObject screenObject) {
-        this.screenObject = screenObject;
-    }
-
     Integer getRow() {
         return row;
     }
@@ -51,15 +33,23 @@ class Tile {
         return wall;
     }
 
-    void setWall(final boolean wall) {
-        this.wall = wall;
+    void setEmpty() {
+        wall = false;
+        treat = false;
+    }
+
+    void setTreat() {
+        wall = false;
+        treat = true;
+    }
+
+    void setWall() {
+        treat = false;
+        wall = true;
     }
 
     boolean isTreat() {
         return treat;
     }
 
-    void setTreat(final boolean treat) {
-        this.treat = treat;
-    }
 }

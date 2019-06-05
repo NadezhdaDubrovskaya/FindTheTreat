@@ -22,11 +22,13 @@ class CircularObject extends ScreenObject {
 
     @Override
     void show() {
-        final int xCoordinate = getTile().getColumn() * SCALE + SCALE / 2;
-        final int yCoordinate = getTile().getRow() * SCALE + SCALE / 2;
-        setVectorPosition(xCoordinate, yCoordinate);
-        getPApplet().fill(getColour().v1, getColour().v2, getColour().v3);
-        getPApplet().ellipse(getVectorPosition().x, getVectorPosition().y, radius * 2, radius * 2);
+        if (getTile() != null) {
+            final int xCoordinate = getTile().getColumn() * SCALE + SCALE / 2;
+            final int yCoordinate = getTile().getRow() * SCALE + SCALE / 2;
+            setVectorPosition(xCoordinate, yCoordinate);
+            getPApplet().fill(getColour().v1, getColour().v2, getColour().v3);
+            getPApplet().ellipse(getVectorPosition().x, getVectorPosition().y, radius * 2, radius * 2);
+        }
     }
 
 }

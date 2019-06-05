@@ -32,7 +32,7 @@ import static java.util.Arrays.stream;
 
 public class Main extends PApplet {
 
-    private final ScreenObject player = new CircularObject(this);
+    private final Player player = new Player(this);
     private final List<ScreenObject> mapTiles = new ArrayList<>();
     private final GameScreen gameScreen = new GameScreen();
     private final DrawNetworkUtility drawNetworkUtility = new DrawNetworkUtility(this);
@@ -56,6 +56,8 @@ public class Main extends PApplet {
     @Override
     public void setup() {
         drawGameScreen();
+        player.setGenome(genome);
+        player.setGameScreen(gameScreen);
     }
 
     @Override
@@ -93,8 +95,6 @@ public class Main extends PApplet {
             return;
         }
         player.setTile(null);
-        currentTile.setScreenObject(null);
-        newTile.setScreenObject(player);
         player.setTile(newTile);
     }
 
@@ -109,6 +109,7 @@ public class Main extends PApplet {
         if (generateNewNetworkButton.mouseIsOver()) {
             Innovations.reset();
             genome = new Genome();
+            player.setGenome(genome);
         }
     }
 
@@ -149,11 +150,11 @@ public class Main extends PApplet {
                         colour.changeColour(MEDIUM_GRAY);
                         break;
                     case WALL_TILE:
-                        requiredTire.setWall(true);
+                        requiredTire.setWall();
                         break;
                     case TREAT_TILE:
                         colour.changeColour(LIGHT_GREEN);
-                        requiredTire.setTreat(true);
+                        requiredTire.setTreat();
                         break;
                     default:
                         throw new InvalidParameterException("Got invalid tile configuration " + tileSetting);
@@ -163,7 +164,7 @@ public class Main extends PApplet {
                 rectangle.setTile(requiredTire);
             }
         }
-        final Tile startingTile = gameScreen.getTileAtPosition(5, 5);
+        final Tile startingTile = gameScreen.getTileAtPosition(6, 5);
         player.setTile(startingTile);
     }
 

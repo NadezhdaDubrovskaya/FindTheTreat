@@ -32,7 +32,7 @@ class GameScreen {
     }
 
     Tile getTileAtPosition(final int i, final int j) {
-        if (i < 0 || i >= ROWS || j < 0 || j >= COLS) {
+        if (isOutOfBounds(i, j)) {
             return null;
         }
         return tiles.get(i).get(j);
@@ -49,11 +49,22 @@ class GameScreen {
     }
 
     boolean isTreatTile(final int i, final int j) {
+        if (isOutOfBounds(i, j)) {
+            return false;
+        }
         return tiles.get(i).get(j).isTreat();
     }
 
     boolean isWallTile(final int i, final int j) {
-        return tiles.get(i).get(j).isWall();
+        if (isOutOfBounds(i, j)) {
+            return true;
+        }
+        final Tile tile = tiles.get(i).get(j);
+        return tile == null || tile.isWall();
+    }
+
+    private boolean isOutOfBounds(final int i, final int j) {
+        return i < 0 || i >= ROWS || j < 0 || j >= COLS;
     }
 
 }
