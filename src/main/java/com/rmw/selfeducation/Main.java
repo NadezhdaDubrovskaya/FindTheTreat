@@ -32,9 +32,10 @@ import static java.util.Arrays.stream;
 
 public class Main extends PApplet {
 
-    private final Player player = new Player(this);
+    // private final Player player = new Player(this);
     private final List<ScreenObject> mapTiles = new ArrayList<>();
     private final GameScreen gameScreen = new GameScreen();
+    private final Population population = new Population(this, gameScreen);
     private final DrawNetworkUtility drawNetworkUtility = new DrawNetworkUtility(this);
     //control buttons
     private final Button addNodeMutationButton = new Button("Add Node Mutation", 50, ROWS * SCALE + 50, 130, 30);
@@ -42,7 +43,6 @@ public class Main extends PApplet {
     private final Button generateNewNetworkButton = new Button("Generate New Network", 50, ROWS * SCALE + 150, 130, 30);
     //TODO this is the test genome, remove it later on
     private Genome genome = new Genome();
-
 
     public static void main(final String[] args) {
         PApplet.main("com.rmw.selfeducation.Main", args);
@@ -56,22 +56,23 @@ public class Main extends PApplet {
     @Override
     public void setup() {
         drawGameScreen();
-        player.setGenome(genome);
-        player.setGameScreen(gameScreen);
+        // player.setGenome(genome);
+        // player.setGameScreen(gameScreen);
     }
 
     @Override
     public void draw() {
         background(LIGHT_BLUE.v1, LIGHT_BLUE.v2, LIGHT_BLUE.v3);
         mapTiles.forEach(ScreenObject::update);
-        player.update();
+        // player.update();
+        population.update();
         drawNeuralNetwork();
         drawControlPanel();
     }
 
     @Override
     public void keyPressed() {
-        final Tile newTile;
+        /*final Tile newTile;
         final Tile currentTile = player.getTile();
         final int currentRow = currentTile.getRow();
         final int currentColumn = currentTile.getColumn();
@@ -95,7 +96,7 @@ public class Main extends PApplet {
             return;
         }
         player.setTile(null);
-        player.setTile(newTile);
+        player.setTile(newTile);*/
     }
 
     @Override
@@ -109,7 +110,7 @@ public class Main extends PApplet {
         if (generateNewNetworkButton.mouseIsOver()) {
             Innovations.reset();
             genome = new Genome();
-            player.setGenome(genome);
+            // player.setGenome(genome);
         }
     }
 
@@ -164,8 +165,6 @@ public class Main extends PApplet {
                 rectangle.setTile(requiredTire);
             }
         }
-        final Tile startingTile = gameScreen.getTileAtPosition(6, 5);
-        player.setTile(startingTile);
     }
 
     // TODO should show currently best performing network but for now showing test network

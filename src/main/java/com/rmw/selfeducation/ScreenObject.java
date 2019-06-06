@@ -3,6 +3,8 @@ package com.rmw.selfeducation;
 import processing.core.PApplet;
 import processing.core.PVector;
 
+import static com.rmw.selfeducation.Configuration.BLACK;
+
 abstract class ScreenObject {
 
     private final PApplet pApplet;
@@ -12,7 +14,7 @@ abstract class ScreenObject {
 
     ScreenObject(final PApplet pApplet) {
         this.pApplet = pApplet;
-        colour = new Colour(255, 255, 255);
+        colour = new Colour(BLACK.v1, BLACK.v2, BLACK.v3);
     }
 
     Tile getTile() {

@@ -20,6 +20,11 @@ class Configuration {
      * Meaning that a tile array 10x15 in size will require a screen of 500x750 px
      */
     static final int SCALE = 30;
+    static final int PLAYER_START_X_POSITION = 5;
+    static final int PLAYER_START_Y_POSITION = 5;
+
+    // genetic algorithm related settings
+    static final int AMOUNT_OF_PLAYERS_IN_POPULATION = 100;
 
     // Map configuration
     static final char EMPTY_TILE = '0';

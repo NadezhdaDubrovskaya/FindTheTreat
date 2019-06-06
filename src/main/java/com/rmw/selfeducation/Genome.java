@@ -32,6 +32,9 @@ class Genome {
      * All input node are connected to the output node with random weight assigned
      */
     Genome() {
+        // it is assumed, that we create a genome like this only for the initial population generation
+        // thus we do not really care about the innovation number yet
+        Innovations.reset();
         // add bias neuron to the network first
         final NodeGene bias = new NodeGene(newNodeInnovationNumber(), BIAS);
         bias.setLayer(0);

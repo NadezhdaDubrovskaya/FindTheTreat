@@ -83,6 +83,7 @@ class NodeGene {
     /**
      * Is used during feed forward
      * Whenever the sumValue is changed, recalculate the outputValue using the activation function
+     *
      * @param value - to be added to the sumValue
      */
     void addSumValue(final float value) {

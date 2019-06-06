@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import static com.rmw.selfeducation.Configuration.PLAYER_START_X_POSITION;
+import static com.rmw.selfeducation.Configuration.PLAYER_START_Y_POSITION;
 import static com.rmw.selfeducation.Configuration.RED;
 
 class Player extends CircularObject {
@@ -16,14 +18,15 @@ class Player extends CircularObject {
     private float fitness;
     private boolean dead;
 
-    Player(final PApplet pApplet) {
-        super(pApplet);
-    }
-
     Player(final PApplet pApplet, final Genome genome, final GameScreen gameScreen) {
         super(pApplet);
         this.genome = genome;
         this.gameScreen = gameScreen;
+        reset();
+    }
+
+    boolean isAlive() {
+        return !dead;
     }
 
     void setGenome(final Genome genome) {
@@ -42,6 +45,14 @@ class Player extends CircularObject {
             checkIfDied();
         }
         super.update();
+    }
+
+    @Override
+    void reset() {
+        fitness = 0;
+        dead = false;
+        final Tile startingTile = gameScreen.getTileAtPosition(PLAYER_START_X_POSITION, PLAYER_START_Y_POSITION);
+        setTile(startingTile);
     }
 
     private void look() {
