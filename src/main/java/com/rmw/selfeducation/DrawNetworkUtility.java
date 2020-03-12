@@ -20,7 +20,7 @@ import static com.rmw.selfeducation.NeuronType.BIAS;
 import static processing.core.PConstants.CENTER;
 
 /**
- * This class is for drawing the ANN on the screen
+ * This class is for the graphical representation of the ANN on the screen
  */
 class DrawNetworkUtility {
 

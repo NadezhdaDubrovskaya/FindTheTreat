@@ -7,7 +7,10 @@ import static com.rmw.selfeducation.Configuration.COLS;
 import static com.rmw.selfeducation.Configuration.ROWS;
 
 /**
- * This class generates and holds the tiles for each square on the game screen
+ * This class generates and holds the tiles for each square on the game screen.
+ * <p>
+ * Basically a representation of the game screen using Tile objects
+ * <p>
  * Also contains various useful method that can be utilized by other classes such as
  * retrieval of a tile under the passed matrix coordinates, search of a treat tile
  * or determining if there is a wall to the side of the passed matrix coordinates
@@ -20,6 +23,15 @@ class GameScreen {
         init();
     }
 
+    /**
+     * During the initialization the map is filled with default tiles,
+     * meaning they are all considered as empty.
+     * <p>
+     * The flag isWall or isTreat is set for each tile during game setup
+     * based on the map configuration
+     * <p>
+     * See Main.drawGameScreen()
+     */
     private void init() {
         for (int i = 0; i < ROWS; i++) {
             final List<Tile> row = new ArrayList<>();

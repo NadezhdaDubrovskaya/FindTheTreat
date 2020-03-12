@@ -1,12 +1,10 @@
 package com.rmw.selfeducation;
 
+import static com.rmw.selfeducation.GameMode.MANUAL_AN;
+
 class Configuration {
 
-    /**
-     * If false then it will behave as a regular game and player will be given an opportunity to run and avoid AIs
-     * If true then it means the game is in the mode of teaching AIs
-     */
-    static final boolean IS_AI_MODE = true;
+    static final GameMode gameMode = MANUAL_AN;
 
     static final int WIDTH = 1500;
     static final int HEIGHT = 800;

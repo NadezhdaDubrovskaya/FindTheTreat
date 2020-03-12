@@ -17,8 +17,6 @@ class Tile {
     Tile(final Integer row, final Integer column) {
         this.row = row;
         this.column = column;
-        wall = false;
-        treat = false;
     }
 
     Integer getRow() {

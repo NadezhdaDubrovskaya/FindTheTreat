@@ -51,8 +51,7 @@ class Player extends CircularObject {
     void reset() {
         fitness = 0;
         dead = false;
-        final Tile startingTile = gameScreen.getTileAtPosition(PLAYER_START_X_POSITION, PLAYER_START_Y_POSITION);
-        setTile(startingTile);
+        setTile(gameScreen.getTileAtPosition(PLAYER_START_X_POSITION, PLAYER_START_Y_POSITION));
     }
 
     private void look() {

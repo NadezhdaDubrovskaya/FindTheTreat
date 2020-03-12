@@ -91,6 +91,10 @@ class NodeGene {
         calculateOutputValue();
     }
 
+    /**
+     * Basically the activation function of the neuron
+     * TODO: make it possible to select an activation function for each neuron from the list of some sort and adjust the method correspondingly
+     */
     private void calculateOutputValue() {
         if (sumValue >= 1) {
             outputValue = 1;
