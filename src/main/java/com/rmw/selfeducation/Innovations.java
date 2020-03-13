@@ -3,9 +3,6 @@ package com.rmw.selfeducation;
 class Innovations {
 
     private static int connectionInnovationNumber;
-    /**
-     * I am not sure whether we really need an innovation number for the node but let's try this out
-     */
     private static int nodeInnovationNumber;
 
     private Innovations() {

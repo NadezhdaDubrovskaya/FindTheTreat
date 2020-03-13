@@ -19,7 +19,8 @@ class NodeGene {
      */
     private float sumValue;
     /**
-     * Value after the activation function that is later on passed to other neurons through the connection
+     * Value after the activation function is applied
+     * This value is later on passed to other neurons through the connection
      */
     private float outputValue;
 
@@ -45,6 +46,10 @@ class NodeGene {
 
     void setLayer(final int layer) {
         this.layer = layer;
+    }
+
+    void incrementLayer() {
+        layer++;
     }
 
     List<ConnectionGene> getOutgoingConnections() {

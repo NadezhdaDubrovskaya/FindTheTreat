@@ -1,6 +1,5 @@
 package com.rmw.selfeducation;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -11,19 +10,25 @@ import static com.rmw.selfeducation.Configuration.INPUT_NEURONS_AMOUNT;
 import static com.rmw.selfeducation.Configuration.OUTPUT_NEURONS_AMOUNT;
 import static com.rmw.selfeducation.Innovations.newConnectionInnovationNumber;
 import static com.rmw.selfeducation.Innovations.newNodeInnovationNumber;
-import static com.rmw.selfeducation.NeuronType.BIAS;
-import static com.rmw.selfeducation.NeuronType.HIDDEN;
-import static com.rmw.selfeducation.NeuronType.INPUT;
-import static com.rmw.selfeducation.NeuronType.OUTPUT;
+import static com.rmw.selfeducation.NeuronType.*;
 
 class Genome {
 
-    private final Random r = new Random();
+    /*
+     * It is important to keep nodes and connections in accordance to their innovation number.
+     * That is why we are using TreeMap and Innovation number as a key
+     */
     private final Map<Integer, NodeGene> nodes = new TreeMap<>();
     private final Map<Integer, ConnectionGene> connections = new TreeMap<>();
 
     private final Map<Integer, List<NodeGene>> nodesByLayer = new TreeMap<>();
+    /**
+     * The amount of layers currently in the genome.
+     * We need to keep track of it for the correct neural network behaviour
+     */
     private int amountOfLayers; // currently in the genome
+
+    private final Random r = new Random();
 
     /**
      * Fresh network always contains:
@@ -100,7 +105,7 @@ class Genome {
      * @return list of output values from each output node
      */
     List<Float> feedForward() {
-        final List<Float> result = new ArrayList<>(OUTPUT_NEURONS_AMOUNT);
+
         // go through all of the neurons and feedForward its output to the nodes its connected with
         nodesByLayer.values().forEach(layer ->
                 layer.forEach(node ->
@@ -112,8 +117,9 @@ class Genome {
                         })
                 )
         );
-        nodesByLayer.get(amountOfLayers - 1).forEach(outputNeuron -> result.add(outputNeuron.getOutputValue()));
-        return result;
+        return nodesByLayer.get(amountOfLayers - 1).stream()
+                .map(NodeGene::getOutputValue)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -144,6 +150,7 @@ class Genome {
 
     /**
      * Mutation during which a new node is added.
+     * <p>
      * The node is added according to the following algorithm:
      * - Choose random connection and disable it
      * - Add a new node to the list of nodes with new node innovation number
@@ -214,11 +221,16 @@ class Genome {
         if (dif == 1) {
             // squeeze new layer in
             final int newLayer = inNodeLayer + 1;
-            // move all layers up to fit in the new one
+            newNode.setLayer(newLayer);
+
+            /*
+             * Move all layers up to fit in the new one.
+             * Note that newNode isn't added to the nodes list yet thus we can safely use a foreach
+             * for all nodes on the newLayer and higher
+             */
             nodes.values().stream()
                     .filter(node -> node.getLayer() >= newLayer)
-                    .forEach(node -> node.setLayer(node.getLayer() + 1));
-            newNode.setLayer(newLayer);
+                    .forEach(NodeGene::incrementLayer);
 
             // it is important to update the layers count after we have introduced a new layer
             updateAmountOfLayers();
@@ -232,13 +244,14 @@ class Genome {
 
     /**
      * Connects all of the currently added neurones to one another.
-     * Should be used during the initial network generation only
+     * Should be used during the initial network generation only.
+     * <p>
+     * Each node on layer 0 connects to every node on layer 1 generating random weight for this connection
      */
     private void connectNeurons() {
-        nodes.values().stream().filter(nodeGene -> nodeGene.getLayer() == 0).forEach(inputNode ->
-                nodes.values().stream().filter(nodeGene -> nodeGene.getLayer() == 1)
-                        .forEach(outputNode ->
-                                addNewConnection(inputNode, outputNode, generateRandomWeight())));
+        nodes.values().stream().filter(nodeGene -> nodeGene.getLayer() == 0)
+                .forEach(inputNode -> nodes.values().stream().filter(nodeGene -> nodeGene.getLayer() == 1)
+                        .forEach(outputNode -> addNewConnection(inputNode, outputNode, generateRandomWeight())));
     }
 
     /**
@@ -247,13 +260,15 @@ class Genome {
      * Do not confuse with addConnection method that is used during crossover
      */
     private void addNewConnection(final NodeGene in, final NodeGene out, final float weight) {
-        final ConnectionGene newConnection = new ConnectionGene(in.getId(), out.getId(), weight, true, newConnectionInnovationNumber());
-        connections.put(newConnection.getInnovationNumber(), newConnection);
+        final int innovationNumber = newConnectionInnovationNumber();
+        final ConnectionGene newConnection = new ConnectionGene(in.getId(), out.getId(), weight, true, innovationNumber);
+        connections.put(innovationNumber, newConnection);
         in.addOutgoingConnection(newConnection);
     }
 
     /**
      * Checks if the chosen nodes are fit for add connection mutation or not
+     * <p>
      * That means that they:
      * - should not be the same node,
      * - should not be on the same layer,
@@ -279,7 +294,8 @@ class Genome {
         for (int i = 0; i < amountOfLayers; i++) {
             final int finalI = i;
             final List<NodeGene> nodesOnThisLayer = nodes.values().stream()
-                    .filter(nodeGene -> nodeGene.getLayer() == finalI).collect(Collectors.toList());
+                    .filter(nodeGene -> nodeGene.getLayer() == finalI)
+                    .collect(Collectors.toList());
             nodesByLayer.put(i, nodesOnThisLayer);
         }
     }

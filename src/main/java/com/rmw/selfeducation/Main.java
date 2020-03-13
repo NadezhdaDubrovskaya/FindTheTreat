@@ -151,16 +151,23 @@ public class Main extends PApplet {
 
     /**
      * Is called during game setup once.
-     * After that the
+     * In this method we get map configuration and update Tiles in the gameScreen so they represent
+     * walls an a treat.
+     * GameScreen should be updated after that.
+     * <p>
+     * We then generate a screen object to be added in the mapTiles. This object is later used during rendering
+     * a represents a specific type of tile.
+     * Screen object is also linked to the tile.
      */
     private void drawGameScreen() {
         final String[] mapConfiguration = getMapConfiguration();
         // generate map tiles in accordance to the map configuration and assign the corresponding tiles
-        // from the game screen to each
-        // also configure the wall and the treat tile
+        // from the game screen to each also configure the wall and the treat tile
         for (int i = 0; i < ROWS; i++) {
             for (int j = 0; j < COLS; j++) {
                 final char tileSetting = mapConfiguration[i].toCharArray()[j];
+
+                // configure tile and colour based on the tile setting from map config
                 final Tile requiredTire = gameScreen.getTileAtPosition(i, j);
                 final Colour colour = new Colour(BLACK.v1, BLACK.v2, BLACK.v3);
                 switch (tileSetting) {
@@ -177,6 +184,8 @@ public class Main extends PApplet {
                     default:
                         throw new InvalidParameterException("Got invalid tile configuration " + tileSetting);
                 }
+
+                // generate screenObject to represent the tile on the screen and linked it to the tile
                 final RectangularObject rectangle = new RectangularObject(this, colour);
                 mapTiles.add(rectangle);
                 rectangle.setTile(requiredTire);

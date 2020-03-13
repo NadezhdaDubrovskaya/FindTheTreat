@@ -18,6 +18,7 @@ import static com.rmw.selfeducation.Configuration.ROWS;
 class GameScreen {
 
     private final List<List<Tile>> tiles = new ArrayList<>(ROWS);
+    private Tile treatTile;
 
     GameScreen() {
         init();
@@ -50,28 +51,33 @@ class GameScreen {
         return tiles.get(i).get(j);
     }
 
+    /**
+     * Includes lazy initialization of a treatTile.
+     * Since the map doesn't change throughout the game there is no need to search
+     * for a treat tile each time the method is called.
+     *
+     * @return tile that represents a treat tile
+     */
     Tile getTreatTile() {
-        for (final List<Tile> row : tiles) {
-            final Tile treatTile = row.stream().filter(Tile::isTreat).findFirst().orElse(null);
-            if (treatTile != null) {
-                return treatTile;
+        if (treatTile == null) {
+            for (final List<Tile> row : tiles) {
+                treatTile = row.stream().filter(Tile::isTreat).findFirst().orElse(null);
+                // if we have managed to find a treat tile in this row - break from the for cycle
+                if (treatTile != null) {
+                    return treatTile;
+                }
             }
         }
-        return null;
+        return treatTile;
     }
 
     boolean isTreatTile(final int i, final int j) {
-        if (isOutOfBounds(i, j)) {
-            return false;
-        }
-        return tiles.get(i).get(j).isTreat();
+        final Tile tile = getTileAtPosition(i, j);
+        return tile != null && tile.isTreat();
     }
 
     boolean isWallTile(final int i, final int j) {
-        if (isOutOfBounds(i, j)) {
-            return true;
-        }
-        final Tile tile = tiles.get(i).get(j);
+        final Tile tile = getTileAtPosition(i, j);
         return tile == null || tile.isWall();
     }
 
