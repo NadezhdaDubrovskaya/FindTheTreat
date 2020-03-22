@@ -4,6 +4,7 @@ import processing.core.PVector;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 class NodeGene {
 
@@ -77,6 +78,10 @@ class NodeGene {
         position.y = y;
     }
 
+    float getOutputValue() {
+        return outputValue;
+    }
+
     /**
      * Resets both sum and outputValue of the neuron
      */
@@ -112,15 +117,24 @@ class NodeGene {
         outputValue = 0;
     }
 
-    float getOutputValue() {
-        return outputValue;
-    }
-
     @Override
     public String toString() {
         return "NodeGene{" +
                 "id=" + id +
                 ", type=" + type +
                 '}';
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        final NodeGene nodeGene = (NodeGene) o;
+        return id == nodeGene.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }

@@ -4,16 +4,18 @@ import processing.core.PApplet;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.TreeMap;
 
 import static com.rmw.selfeducation.Configuration.*;
 
-class Player extends CircularObject {
+class Player extends CircularObject implements Comparable<Player> {
 
     private Genome genome;
     // player has to know about game screen to be able to see obstacles and the location of the treat
     private GameScreen gameScreen;
     private int moves;
+    private int fitness = Integer.MAX_VALUE;
     private boolean dead;
 
     Player(final PApplet pApplet, final Genome genome, final GameScreen gameScreen) {
@@ -25,6 +27,10 @@ class Player extends CircularObject {
 
     boolean isAlive() {
         return !dead;
+    }
+
+    int getFitness() {
+        return fitness;
     }
 
     void setGenome(final Genome genome) {
@@ -48,8 +54,26 @@ class Player extends CircularObject {
     @Override
     void reset() {
         moves = 0;
+        fitness = Integer.MAX_VALUE;
         dead = false;
         setTile(gameScreen.getTileAtPosition(PLAYER_START_X_POSITION, PLAYER_START_Y_POSITION));
+    }
+
+    /**
+     * Calculates and returns the fitness of the player.
+     * The less the better
+     */
+    void calculateFitness() {
+        fitness = calculateDistanceToTheTreat() + moves;
+        if (dead) {
+            fitness += 1000;
+        }
+    }
+
+    private int calculateDistanceToTheTreat() {
+        final int xDist = Math.abs(getTile().getRow() - gameScreen.getTreatTile().getRow());
+        final int yDist = Math.abs(getTile().getColumn() - gameScreen.getTreatTile().getColumn());
+        return xDist + yDist;
     }
 
     /**
@@ -124,11 +148,11 @@ class Player extends CircularObject {
     /**
      * This method is required because when player reacts according to its ANN response, it doesn't check
      * whether the direction is a wall or not, thus it can occasionally try to go through and end up in the wall.
-     *
+     * <p>
      * To punish such behaviour the concept of death is introduced.
      * Whenever an ANN made a decision to go through the wall the player dies and cannot move any more.
      * Thus only the players that figured out how to avoid hitting the walls will reproduce.
-     *
+     * <p>
      * This method also increases the moves count that is later on used in the fitness calculation
      */
     private void checkIfDied() {
@@ -138,5 +162,23 @@ class Player extends CircularObject {
         } else {
             moves++;
         }
+    }
+
+    @Override
+    public int compareTo(final Player o) {
+        return Integer.compare(getFitness(), o.getFitness());
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        final Player player = (Player) o;
+        return Objects.equals(genome, player.genome);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(genome);
     }
 }

@@ -1,5 +1,8 @@
 package com.rmw.selfeducation;
 
+import java.text.MessageFormat;
+import java.util.Objects;
+
 class ConnectionGene {
 
     private int inNode;
@@ -58,5 +61,25 @@ class ConnectionGene {
 
     void setInnovationNumber(final int innovationNumber) {
         this.innovationNumber = innovationNumber;
+    }
+
+    @Override
+    public String toString() {
+        return MessageFormat.format("Innovation {0}. {1} -> {2}. Weight: {3}. Expressed: {4}",
+                innovationNumber, inNode, outNode, weight, expressed);
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        final ConnectionGene that = (ConnectionGene) o;
+        return inNode == that.inNode &&
+                outNode == that.outNode;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(inNode, outNode);
     }
 }

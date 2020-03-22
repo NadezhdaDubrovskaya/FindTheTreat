@@ -2,6 +2,7 @@ package com.rmw.selfeducation;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Random;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
@@ -94,8 +95,8 @@ class Genome {
             }
         });
         // set new values for input neurons
-        for (final Map.Entry<Integer, Float> entry : inputs.entrySet()) {
-            nodes.get(entry.getKey()).addSumValue(entry.getValue());
+        for (final Map.Entry<Integer, Float> input : inputs.entrySet()) {
+            nodes.get(input.getKey()).addSumValue(input.getValue());
         }
     }
 
@@ -311,4 +312,17 @@ class Genome {
         return r.nextInt((max - min) + 1) + min;
     }
 
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        final Genome genome = (Genome) o;
+        return Objects.equals(nodes, genome.nodes) &&
+                Objects.equals(connections, genome.connections);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(nodes, connections);
+    }
 }

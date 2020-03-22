@@ -1,10 +1,10 @@
 package com.rmw.selfeducation;
 
-import static com.rmw.selfeducation.GameMode.MANUAL_AN;
+import static com.rmw.selfeducation.GameMode.NEAT;
 
 class Configuration {
 
-    static final GameMode gameMode = MANUAL_AN;
+    static final GameMode gameMode = NEAT;
 
     static final int WIDTH = 1500;
     static final int HEIGHT = 800;
