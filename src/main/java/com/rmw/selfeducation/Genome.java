@@ -29,8 +29,6 @@ class Genome {
      */
     private int amountOfLayers; // currently in the genome
 
-    private final Random r = new Random();
-
     /**
      * Fresh network always contains:
      * 2 layers of nodes - one for inputs and another one for outputs
@@ -134,18 +132,18 @@ class Genome {
             return;
         }
 
-        NodeGene node1 = nodes.get(r.nextInt(nodes.size()));
-        NodeGene node2 = nodes.get(r.nextInt(nodes.size()));
+        NodeGene node1 = nodes.get(Utils.getRandomInt(nodes.size()));
+        NodeGene node2 = nodes.get(Utils.getRandomInt(nodes.size()));
         while (nodesAreNotGood(node1, node2)) {
-            node1 = nodes.get(r.nextInt(nodes.size()));
-            node2 = nodes.get(r.nextInt(nodes.size()));
+            node1 = nodes.get(Utils.getRandomInt(nodes.size()));
+            node2 = nodes.get(Utils.getRandomInt(nodes.size()));
         }
 
         // checks if nodes have to be swapped since only the "left-to-right" connections are allowed
         if (node1.getLayer() > node2.getLayer()) {
-            addNewConnection(node2, node1, generateRandomWeight());
+            addNewConnection(node2, node1, Utils.generateRandomWeight());
         } else {
-            addNewConnection(node1, node2, generateRandomWeight());
+            addNewConnection(node1, node2, Utils.generateRandomWeight());
         }
     }
 
@@ -160,10 +158,10 @@ class Genome {
      * 2. From new node to out node of the disable connection with disabled connection weight
      */
     void addNodeMutation() {
-        ConnectionGene connectionToBeDisabled = connections.get(r.nextInt(connections.size()));
+        ConnectionGene connectionToBeDisabled = connections.get(Utils.getRandomInt(connections.size()));
         // if chosen connection is already disabled - select a new one. Repeat until we get valid connection
         while (!connectionToBeDisabled.isExpressed()) {
-            connectionToBeDisabled = connections.get(r.nextInt(connections.size()));
+            connectionToBeDisabled = connections.get(Utils.getRandomInt(connections.size()));
         }
 
         connectionToBeDisabled.disable();
@@ -239,7 +237,7 @@ class Genome {
             newNode.setLayer(inNodeLayer + 1);
         } else {
             // choose random layer between in and out nodes
-            newNode.setLayer(getRandomNumberInRange(inNodeLayer + 1, outNodeLayer - 1));
+            newNode.setLayer(Utils.getRandomNumberInRange(inNodeLayer + 1, outNodeLayer - 1));
         }
     }
 
@@ -252,7 +250,7 @@ class Genome {
     private void connectNeurons() {
         nodes.values().stream().filter(nodeGene -> nodeGene.getLayer() == 0)
                 .forEach(inputNode -> nodes.values().stream().filter(nodeGene -> nodeGene.getLayer() == 1)
-                        .forEach(outputNode -> addNewConnection(inputNode, outputNode, generateRandomWeight())));
+                        .forEach(outputNode -> addNewConnection(inputNode, outputNode, Utils.generateRandomWeight())));
     }
 
     /**
@@ -299,17 +297,6 @@ class Genome {
                     .collect(Collectors.toList());
             nodesByLayer.put(i, nodesOnThisLayer);
         }
-    }
-
-    private float generateRandomWeight() {
-        return r.nextFloat() * 2f - 1f;
-    }
-
-    private int getRandomNumberInRange(final int min, final int max) {
-        if (min >= max) {
-            throw new IllegalArgumentException("Max must be greater than min");
-        }
-        return r.nextInt((max - min) + 1) + min;
     }
 
     @Override

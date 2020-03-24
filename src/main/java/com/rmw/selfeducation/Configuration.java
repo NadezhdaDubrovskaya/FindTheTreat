@@ -22,7 +22,8 @@ class Configuration {
     static final int PLAYER_START_Y_POSITION = 5;
 
     // genetic algorithm related settings
-    static final int AMOUNT_OF_PLAYERS_IN_POPULATION = 100;
+    static final int POPULATION_SIZE = 100;
+    static final float GENOCIDE_PERCENTAGE = 0.75f;
 
     // Map configuration
     static final char EMPTY_TILE = '0';

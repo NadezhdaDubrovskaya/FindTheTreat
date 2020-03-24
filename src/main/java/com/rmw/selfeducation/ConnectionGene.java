@@ -75,11 +75,14 @@ class ConnectionGene {
         if (o == null || getClass() != o.getClass()) return false;
         final ConnectionGene that = (ConnectionGene) o;
         return inNode == that.inNode &&
-                outNode == that.outNode;
+                outNode == that.outNode &&
+                Float.compare(that.weight, weight) == 0 &&
+                expressed == that.expressed &&
+                innovationNumber == that.innovationNumber;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(inNode, outNode);
+        return Objects.hash(inNode, outNode, weight, expressed, innovationNumber);
     }
 }
