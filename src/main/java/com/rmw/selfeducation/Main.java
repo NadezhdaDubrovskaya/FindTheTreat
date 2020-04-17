@@ -56,7 +56,7 @@ public class Main extends PApplet {
     public void setup() {
         drawGameScreen();
         if (gameMode.equals(GameMode.MANUAL_GAME) || gameMode.equals(GameMode.MANUAL_AN)) {
-            genome = new Genome();
+            genome = GenomeGenerator.getInitialGenome();
             player = new Player(this, genome, gameScreen);
         }
         if (gameMode.equals(GameMode.NEAT)) {
@@ -71,6 +71,7 @@ public class Main extends PApplet {
         switch (gameMode) {
             case NEAT:
                 population.update();
+                drawNeuralNetwork();
                 break;
             case MANUAL_AN:
                 player.update();
@@ -140,7 +141,7 @@ public class Main extends PApplet {
         }
         if (generateNewNetworkButton.mouseIsOver()) {
             Innovations.reset();
-            genome = new Genome();
+            genome = GenomeGenerator.getInitialGenome();
             player.setGenome(genome);
             player.reset();
         }
@@ -227,11 +228,14 @@ public class Main extends PApplet {
         }
     }
 
-    // TODO should show currently best performing network but for now showing test network
     private void drawNeuralNetwork() {
         fill(WHITE.v1, WHITE.v2, WHITE.v3);
         rect(START_X, START_Y, ANN_WIDTH, ANN_HEIGHT);
-        drawNetworkUtility.draw(genome);
+        if (gameMode.equals(GameMode.NEAT)) {
+            drawNetworkUtility.draw(population.getBestPlayer().getGenome());
+        } else {
+            drawNetworkUtility.draw(genome);
+        }
     }
 
     private void drawControlPanel() {

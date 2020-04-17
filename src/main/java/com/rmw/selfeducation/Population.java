@@ -11,6 +11,9 @@ import static com.rmw.selfeducation.Configuration.POPULATION_SIZE;
 
 class Population {
 
+    private final PApplet pApplet;
+    private final GameScreen gameScreen;
+
     private final List<Player> players = new ArrayList<>();
     private int currentGeneration = 1;
     private int populationAliveFor; //how many updates the current population is alive
@@ -31,8 +34,10 @@ class Population {
     private static final int INCREASE_POPULATION_LIFE_SPAN_RATE = 15;
 
     Population(final PApplet pApplet, final GameScreen gameScreen) {
+        this.pApplet = pApplet;
+        this.gameScreen = gameScreen;
         for (int i = 0; i < POPULATION_SIZE; i++) {
-            final Player player = new Player(pApplet, new Genome(), gameScreen);
+            final Player player = new Player(pApplet, GenomeGenerator.getInitialGenome(), gameScreen);
             players.add(player);
         }
         bestPlayer = players.get(0);
@@ -53,6 +58,9 @@ class Population {
         }
     }
 
+    Player getBestPlayer() {
+        return bestPlayer;
+    }
 
     private class GeneticAlgorithm {
 
@@ -63,7 +71,8 @@ class Population {
             assignBestPlayer();
             killTheWeakOnes();
             breedTheSurvivors();
-        }
+            resetPlayers();
+         }
 
         private void assignBestPlayer() {
             players.forEach(Player::calculateFitness);
@@ -103,7 +112,9 @@ class Population {
              * We might have killed the best player (low chances and yet...)
              * so we bring him back into the population if necessary
              */
-
+            if (!players.get(0).equals(bestPlayer)) {
+                players.add(0, bestPlayer);
+            }
         }
 
         private int calculateSummaryFitness() {
@@ -118,7 +129,16 @@ class Population {
          * The majority of players are formed as a result of breeding the survivals using crossover
          */
         private void breedTheSurvivors() {
-
+            while (players.size() < POPULATION_SIZE) {
+                final Player firstParent = players.get(Utils.getRandomInt(players.size()-1));
+                Player secondParent = players.get(Utils.getRandomInt(players.size()-1));
+                while (secondParent.equals(firstParent)) {
+                    secondParent = players.get(Utils.getRandomInt(players.size()-1));
+                }
+                final Genome genome = GenomeGenerator.getChildGenome(firstParent, secondParent);
+                final Player child = new Player(pApplet, genome, gameScreen);
+                players.add(child);
+            }
         }
 
         /**
@@ -126,6 +146,10 @@ class Population {
          */
         private void mutate() {
 
+        }
+
+        private void resetPlayers() {
+            players.forEach(Player::reset);
         }
 
 

@@ -3,15 +3,13 @@ package com.rmw.selfeducation;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Random;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
-import static com.rmw.selfeducation.Configuration.INPUT_NEURONS_AMOUNT;
-import static com.rmw.selfeducation.Configuration.OUTPUT_NEURONS_AMOUNT;
 import static com.rmw.selfeducation.Innovations.newConnectionInnovationNumber;
 import static com.rmw.selfeducation.Innovations.newNodeInnovationNumber;
-import static com.rmw.selfeducation.NeuronType.*;
+import static com.rmw.selfeducation.NeuronType.BIAS;
+import static com.rmw.selfeducation.NeuronType.HIDDEN;
 
 class Genome {
 
@@ -29,36 +27,7 @@ class Genome {
      */
     private int amountOfLayers; // currently in the genome
 
-    /**
-     * Fresh network always contains:
-     * 2 layers of nodes - one for inputs and another one for outputs
-     * Among input node a bias neuron is added
-     * All input node are connected to the output node with random weight assigned
-     */
-    Genome() {
-        // it is assumed, that we create a genome like this only for the initial population generation
-        // thus we do not really care about the innovation number yet
-        Innovations.reset();
-        // add bias neuron to the network first
-        final NodeGene bias = new NodeGene(newNodeInnovationNumber(), BIAS);
-        bias.setLayer(0);
-        bias.addSumValue(1f); //bias neuron always has an output value of 1
-        nodes.put(bias.getId(), bias);
-
-        // generate input nodes
-        for (int i = 0; i < INPUT_NEURONS_AMOUNT; i++) {
-            final int nodeInnovationNumber = newNodeInnovationNumber();
-            nodes.put(nodeInnovationNumber, new NodeGene(nodeInnovationNumber, INPUT));
-            nodes.get(nodeInnovationNumber).setLayer(0);
-        }
-
-        // generate output nodes
-        for (int i = 0; i < OUTPUT_NEURONS_AMOUNT; i++) {
-            final int nodeInnovationNumber = newNodeInnovationNumber();
-            nodes.put(nodeInnovationNumber, new NodeGene(nodeInnovationNumber, OUTPUT));
-            nodes.get(nodeInnovationNumber).setLayer(1);
-        }
-
+    void firstInitialization() {
         connectNeurons();
         updateAmountOfLayers();
         updateNodesByLayers();
@@ -78,6 +47,10 @@ class Genome {
 
     int getAmountOfLayers() {
         return amountOfLayers;
+    }
+
+    void setAmountOfLayers(final int amountOfLayers) {
+        this.amountOfLayers = amountOfLayers;
     }
 
     /**
@@ -158,10 +131,10 @@ class Genome {
      * 2. From new node to out node of the disable connection with disabled connection weight
      */
     void addNodeMutation() {
-        ConnectionGene connectionToBeDisabled = connections.get(Utils.getRandomInt(connections.size()));
+        ConnectionGene connectionToBeDisabled = connections.get(Utils.getRandomInt(connections.size() - 1));
         // if chosen connection is already disabled - select a new one. Repeat until we get valid connection
         while (!connectionToBeDisabled.isExpressed()) {
-            connectionToBeDisabled = connections.get(Utils.getRandomInt(connections.size()));
+            connectionToBeDisabled = connections.get(Utils.getRandomInt(connections.size() - 1));
         }
 
         connectionToBeDisabled.disable();
@@ -178,6 +151,17 @@ class Genome {
         addNewConnection(newNode, disabledConnectionOutNode, disabledConnectionWeight);
 
         updateNodesByLayers();
+    }
+
+    void updateNodesByLayers() {
+        nodesByLayer.clear();
+        for (int i = 0; i < amountOfLayers; i++) {
+            final int finalI = i;
+            final List<NodeGene> nodesOnThisLayer = nodes.values().stream()
+                    .filter(nodeGene -> nodeGene.getLayer() == finalI)
+                    .collect(Collectors.toList());
+            nodesByLayer.put(i, nodesOnThisLayer);
+        }
     }
 
     /**
@@ -256,7 +240,6 @@ class Genome {
     /**
      * Used to generate new connection, add it to the connections pull using new innovation number and then update
      * outgoing connections of the in node gene with this newly created connection
-     * Do not confuse with addConnection method that is used during crossover
      */
     private void addNewConnection(final NodeGene in, final NodeGene out, final float weight) {
         final int innovationNumber = newConnectionInnovationNumber();
@@ -286,17 +269,6 @@ class Genome {
             if (nodeGene.getLayer() > amountOfLayers) amountOfLayers = nodeGene.getLayer();
         }
         amountOfLayers++;
-    }
-
-    private void updateNodesByLayers() {
-        nodesByLayer.clear();
-        for (int i = 0; i < amountOfLayers; i++) {
-            final int finalI = i;
-            final List<NodeGene> nodesOnThisLayer = nodes.values().stream()
-                    .filter(nodeGene -> nodeGene.getLayer() == finalI)
-                    .collect(Collectors.toList());
-            nodesByLayer.put(i, nodesOnThisLayer);
-        }
     }
 
     @Override

@@ -13,6 +13,10 @@ public class Utils {
         return RANDOM.nextInt(max);
     }
 
+    public static boolean randomBoolean() {
+        return RANDOM.nextBoolean();
+    }
+
     public static float generateRandomWeight() {
         return RANDOM.nextFloat() * 2f - 1f;
     }

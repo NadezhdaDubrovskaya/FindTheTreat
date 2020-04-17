@@ -19,6 +19,10 @@ class ConnectionGene {
         this.innovationNumber = innovationNumber;
     }
 
+    ConnectionGene copy() {
+        return new ConnectionGene(inNode, outNode, weight, expressed, innovationNumber);
+    }
+
     int getInNode() {
         return inNode;
     }

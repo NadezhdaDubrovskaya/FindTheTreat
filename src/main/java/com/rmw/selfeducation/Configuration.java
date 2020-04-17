@@ -24,6 +24,9 @@ class Configuration {
     // genetic algorithm related settings
     static final int POPULATION_SIZE = 100;
     static final float GENOCIDE_PERCENTAGE = 0.75f;
+    static final float ADD_NODE_MUTATION_CHANCE = 0.1f;
+    static final float ADD_CONNECTION_MUTATION_CHANCE = 0.1f;
+    static final float RANDOM_WEIGHT_MUTATION_CHANCE = 0.5f;
 
     // Map configuration
     static final char EMPTY_TILE = '0';

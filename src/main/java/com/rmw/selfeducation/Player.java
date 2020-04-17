@@ -33,6 +33,8 @@ class Player extends CircularObject implements Comparable<Player> {
         return fitness;
     }
 
+    Genome getGenome() { return genome; }
+
     void setGenome(final Genome genome) {
         this.genome = genome;
     }

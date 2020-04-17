@@ -31,6 +31,16 @@ class NodeGene {
     }
 
     /**
+     * Generates a copy of this node but without connections
+     * @return
+     */
+    NodeGene copy() {
+        final NodeGene copy = new NodeGene(id, type);
+        copy.setLayer(layer);
+        return copy;
+    }
+
+    /**
      * Checks if the node is already connected to the passed node
      */
     boolean isConnectedTo(final NodeGene node) {
